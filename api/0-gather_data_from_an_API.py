@@ -1,24 +1,33 @@
 #!/usr/bin/python3
+"""
+Script that uses a REST API to return information about
+an employee's TODO list progress.
+"""
+
 import requests
 import sys
 
-employeeId = int(sys.argv[1])
 
-user = requests.get(f"https://jsonplaceholder.typicode.com/users/{employeeId}").json()
-name = user["name"]
+if __name__ == "__main__":
+    employee_id = int(sys.argv[1])
 
-todos = requests.get(f"https://jsonplaceholder.typicode.com/todos?userId={employeeId}").json()
+    # Fetch user data
+    user = requests.get(
+        f"https://jsonplaceholder.typicode.com/users/{employee_id}"
+    ).json()
+    name = user.get("name")
 
-doneWork = 0
-totalWork = len(todos)
-completed_tasks = []
+    # Fetch todos for this user
+    todos = requests.get(
+        f"https://jsonplaceholder.typicode.com/todos",
+        params={"userId": employee_id}
+    ).json()
 
-for task in todos:
-    if task["completed"]:
-        completed_tasks.append(task["title"])
-        doneWork += 1
+    # Compute total and completed tasks
+    total_tasks = len(todos)
+    done_tasks = [task for task in todos if task.get("completed")]
 
-print(f"Employee {name} is done with tasks({doneWork}/{totalWork}):")
-for title in completed_tasks:
-    print(f"\t {title}")
-    
+    # Display output
+    print(f"Employee {name} is done with tasks({len(done_tasks)}/{total_tasks}):")
+    for task in done_tasks:
+        print(f"\t {task.get('title')}")
