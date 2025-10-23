@@ -14,17 +14,18 @@ if __name__ == "__main__":
     todos = requests.get("https://jsonplaceholder.typicode.com/todos").json()
     users  = requests.get("https://jsonplaceholder.typicode.com/users").json()
 
-    for user in users :
-        json_data = {
-            str(user): [
-                {
-                    "task": task.get("title"),
-                    "completed": task.get("completed"),
-                    "username": user
-                } for task in todos
+    json_data = {}
 
-            ]
-        }   
+    for user in users:
+        user_tasks = [
+            {
+                "username": user["username"],
+                "task": task["title"],
+                "completed": task["completed"]
+            }
+            for task in todos if task["userId"] == user["id"]
+        ]
+        json_data[str(user["id"])] = user_tasks
 
-    with open ("todo_all_employees.json", "w") as jsonfile:
-        json.dump(json_data,jsonfile)   
+    with open("todo_all_employees.json", "w") as jsonfile:
+        json.dump(json_data, jsonfile, indent=4)
