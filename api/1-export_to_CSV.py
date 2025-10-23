@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import requests
 import sys
-import s
+import csv
 
 employeeId = int(sys.argv[1])
 
@@ -11,6 +11,7 @@ name = user["name"]
 todos = requests.get(f"https://jsonplaceholder.typicode.com/todos?userId={employeeId}").json()
 
 data = []
+outputFile = "USER_ID.csv"
 
 for task in todos:
     if task["completed"]:
@@ -20,5 +21,7 @@ for task in todos:
 
 
 
-
+with open(outputFile,"w",newline='') as csvfile :
+    csv_writer = csv.writer(csvfile)
+    csv_writer.writerows(data)
     
