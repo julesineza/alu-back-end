@@ -1,32 +1,31 @@
 #!/usr/bin/python3
 
 """
-script that extracts data from api and writes the data to a csv file
+Script that uses a REST API to export data in the CSV format.
 """
+
 import csv
 import requests
 import sys
 
+
 if __name__ == "__main__":
-    employeeId = int(sys.argv[1])
+    employee_id = int(sys.argv[1])
 
-    user = requests.get(f"https://jsonplaceholder.typicode.com/users/{employeeId}").json()
-    name = user["name"]
+    # Fetch user and todos
+    user = requests.get(f"https://jsonplaceholder.typicode.com/users/{employee_id}").json()
+    username = user.get("username")
 
-    todos = requests.get(f"https://jsonplaceholder.typicode.com/todos?userId={employeeId}").json()
+    todos = requests.get(f"https://jsonplaceholder.typicode.com/todos", params={"userId": employee_id}).json()
 
-    data = []
-    outputFile = f"{employeeId}.csv"
-
-    for task in todos:
-        if task["completed"]:
-            data.append([f"{employeeId}",name,"True",task["title"]])
-        data.append([f"{employeeId}",name,"False",task["title"]])
-        
-
-
-
-    with open(outputFile,"w",newline='') as csvfile :
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerows(data)
-    
+    # Prepare CSV data
+    filename = f"{employee_id}.csv"
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+        for task in todos:
+            writer.writerow([
+                str(employee_id),
+                username,
+                str(task.get("completed")),
+                task.get("title")
+            ])
