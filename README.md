@@ -1,1 +1,1 @@
-Readme file for alu-backend api stuff
+Readme file for alu-backend
